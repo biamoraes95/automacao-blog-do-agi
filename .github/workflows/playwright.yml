@@ -2,35 +2,34 @@ name: Playwright Tests
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
   pull_request:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
   test:
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        node-version: [18.x]
+
     steps:
-      - name: Checkout do código
-        uses: actions/checkout@v3
+    - name: Checkout repo
+      uses: actions/checkout@v3
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
 
-      - name: Instalar dependências
-        run: npm ci
+    - name: Install dependencies
+      run: npm install
 
-      - name: Instalar navegadores do Playwright
-        run: npx playwright install --with-deps
+    - name: Install Playwright browsers
+      run: npx playwright install --with-deps
 
-      - name: Executar testes
-        run: npx playwright test
-
-      - name: Salvar relatório como artefato
-        if: always()
-        uses: actions/upload-artifact@v3
-        with:
-          name: playwright-report
-          path: playwright-report/
+    - name: Run tests
+      run: npx playwright test --reporter=list
