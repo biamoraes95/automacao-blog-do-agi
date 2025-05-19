@@ -1,0 +1,16 @@
+# Playwright test outputs
+test-results/
+*.webm
+*.png
+
+# Node modules
+node_modules/
+
+# Logs
+*.log
+
+# Environment files
+.env
+
+# MacOS system files
+.DS_Store
