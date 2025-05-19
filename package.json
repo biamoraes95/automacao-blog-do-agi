@@ -1,0 +1,21 @@
+{
+    "name": "automacao-blog-do-agi",
+    "version": "1.0.0",
+    "description": "Testes automatizados com Playwright para o blog do Agi",
+    "main": "index.js",
+    "scripts": {
+      "test": "npx playwright test",
+      "test:headed": "npx playwright test --headed",
+      "test:debug": "npx playwright test --debug",
+      "report": "npx playwright show-report"
+    },
+    "keywords": [],
+    "author": "biamoraes",
+    "license": "MIT",
+    "devDependencies": {
+      "@playwright/test": "^1.43.0",
+      "typescript": "^5.4.0",
+      "ts-node": "^10.9.1"
+    }
+  }
+  

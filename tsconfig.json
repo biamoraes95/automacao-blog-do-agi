@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",                       // Compatível com recursos modernos
+    "module": "CommonJS",                     // Usado por Node.js; OK para Playwright
+    "strict": true,                           // Mantém boas práticas de tipagem
+    "esModuleInterop": true,                  // Permite importações padrão de libs CommonJS
+    "skipLibCheck": true,                     // Evita verificação de tipos de dependências
+    "forceConsistentCasingInFileNames": true,// Evita problemas em SOs com case sensitivity
+    "moduleResolution": "node",              // Resolve módulos no estilo Node.js
+    "resolveJsonModule": true,               // Permite importar arquivos .json
+    "outDir": "dist",                         // Pasta de saída (caso compile com tsc)
+    "types": ["@playwright/test"],            // Importa as tipagens globais do Playwright
+    "allowJs": false,                         // (opcional) Bloqueia arquivos JS, só TS
+    "isolatedModules": true                   // (opcional) Garante compatibilidade com transpilers como Babel
+  },
+  "include": ["tests/**/*.ts"]
+}
