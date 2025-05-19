@@ -13,3 +13,4 @@ Automação de testes usando Playwright para validar a busca de artigos no [blog
 ```bash
 git clone https://github.com/biamoraes95/automacao-blog-do-agi.git
 cd automacao-blog-do-agi
+# automacao-blog-do-agi
