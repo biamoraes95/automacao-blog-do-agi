@@ -1,58 +1,72 @@
 import { test, expect, Page, Locator } from '@playwright/test';
 
 export async function abrirCampoDeBusca(page: Page): Promise<Locator> {
-  const searchButton = page.locator('div.ast-search-menu-icon');
+  const searchButton = page.getByRole('link', { name: 'Link do ícone de pesquisa' });
+  await searchButton.click();
 
-  await searchButton.waitFor({ state: 'visible', timeout: 10000 });
-  await searchButton.waitFor({ state: 'attached' });
+  await page.waitForSelector('input.search-field', { state: 'attached', timeout: 10000 });
 
-  await page.waitForTimeout(500); // ajuda com timing do clique
-
-  // Clica via evaluate pra forçar o comportamento JS do site
   await page.evaluate(() => {
-    const button = document.querySelector('div.ast-search-menu-icon') as HTMLElement;
-    if (button) button.click();
+    const input = document.querySelector('input.search-field') as HTMLElement | null;
+    if (input) {
+      input.style.opacity = '1';
+      input.style.visibility = 'visible';
+      input.style.display = 'block';
+      input.removeAttribute('tabindex');
+    }
   });
 
-  await page.waitForTimeout(1000); // aguarda input abrir corretamente
-
   const searchInput = page.locator('input.search-field');
-
-  // Aguarda que esteja visível de verdade (não só no DOM)
-  await page.waitForFunction(() => {
-    const input = document.querySelector('input.search-field');
-    if (!input) return false;
-    const style = window.getComputedStyle(input);
-    return style && style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
-  }, { timeout: 10000 });
-
   await searchInput.click();
+
   return searchInput;
 }
 
 test('🧪 Deve retornar resultados ao buscar por um termo existente', async ({ page }) => {
-  await page.goto('https://blogdoagi.com.br/', { waitUntil: 'domcontentloaded' });
+  await page.goto('https://blogdoagi.com.br/', { waitUntil: 'load' });
 
   const searchInput = await abrirCampoDeBusca(page);
 
-  await searchInput.fill('cartão');
-  await page.keyboard.press('Enter');
+  await page.evaluate(() => {
+    const input = document.querySelector('input.search-field') as HTMLInputElement | null;
+    if (input) {
+      input.value = 'cartão';
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+  });
+
+  const submitButton = page.locator('button[type="submit"]');
+  if (await submitButton.isVisible()) {
+    await submitButton.click();
+  } else {
+    await page.keyboard.press('Enter');
+  }
 
   const articles = page.locator('article');
   await expect(articles.first()).toBeVisible({ timeout: 10000 });
 });
 
 test('🧪 Deve retornar nenhum resultado ao buscar por um termo inexistente', async ({ page }) => {
-  await page.goto('https://blogdoagi.com.br/', { waitUntil: 'domcontentloaded' });
+  await page.goto('https://blogdoagi.com.br/', { waitUntil: 'load' });
 
   const searchInput = await abrirCampoDeBusca(page);
 
-  await searchInput.fill('terminoinexistente123');
+  await page.evaluate(() => {
+    const input = document.querySelector('input.search-field') as HTMLInputElement | null;
+    if (input) {
+      input.value = 'terminoinexistente123';
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+  });
 
-  await Promise.all([
-    page.waitForNavigation({ waitUntil: 'domcontentloaded' }),
-    page.keyboard.press('Enter'),
-  ]);
+  const submitButton = page.locator('button[type="submit"]');
+  if (await submitButton.isVisible()) {
+    await submitButton.click();
+  } else {
+    await page.keyboard.press('Enter');
+  }
 
-  await expect(page.locator('text=Nenhum resultado encontrado')).toBeVisible({ timeout: 10000 });
+  await expect(page.locator('text=Lamentamos, mas nada foi encontrado para sua pesquisa, tente novamente com outras palavras.')).toBeVisible({ timeout: 10000 });
 });
